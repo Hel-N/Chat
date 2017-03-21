@@ -1,6 +1,9 @@
 #pragma comment (lib, "WS2_32.lib")
 #include <iostream>
 #include <vector>
+#include <string>
+#include <cstring>
+#include <map>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -10,6 +13,8 @@ using namespace std;
 
 SOCKET сonnect_socket; // Подключаемые пользователи
 vector<SOCKET> Connections; // Все подключенные пользователи
+//map<string, SOCKET> Connections; // Все подключенные пользователи
+vector<bool> online_connections;
 SOCKET listen_socket; // Сокет для подключения
 int client_count = 0;
 
@@ -67,7 +72,18 @@ int main(){
 	while (true){
 		if (сonnect_socket = accept(listen_socket, NULL, NULL)){ //null - ?????????
 			Connections.push_back(сonnect_socket);
-			client_count++; //если но тключился???????!!!
+			online_connections.push_back(true);
+			client_count++; //если он oтключился???????!!!
+
+			/*//Получение ника пользователя
+			char* buff = new char[1024];
+			int nsize;
+			if ((nsize = recv(сonnect_socket, buff, sizeof(buff), NULL)) != SOCKET_ERROR){
+			buff[nsize] = '\0';
+			string str = buff;
+			Connections[str] = сonnect_socket;
+			}*/
+
 			send(сonnect_socket, message_ready, strlen(message_ready), NULL);
 			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)SendMessageToClients, (LPVOID)(client_count - 1), NULL, NULL); // Создаем поток и запускаем функцию в потоке
 		}
@@ -77,17 +93,43 @@ int main(){
 }
 
 void SendMessageToClients(int clientID){
-	char *buff = new char [1024];
+	char *buff = new char[1024];
+	char *buffmes = new char[1024];
 	int nsize;
-	while(true){
+
+	bool startMessageFlag = false;
+	string message = "";
+
+	while (true){
 		memset(buff, 0, sizeof(buff));
 		if ((nsize = recv(Connections[clientID], buff, sizeof(buff), NULL)) != SOCKET_ERROR){
-			//cout << buff << endl;
 			buff[nsize] = '\0';
-			for (int i = 0; i < Connections.size(); ++i){
-				send(Connections[i], buff, strlen(buff), NULL);
+
+			if (buff[0] == '|'){
+				startMessageFlag = true;
+				message += buff;
 			}
+			else{
+				if (buff[nsize - 1] == '|'){
+					startMessageFlag = false;
+					message += buff;
+					//strcpy_s(buff, message.c_str());
+				}
+				else{
+					message += buff;
+				}
+			}
+
+
+		//string s = buff;
+		//cout << s << endl;
+
+		for (int i = 0; i < Connections.size() && !startMessageFlag; ++i){
+			send(Connections[i], message.c_str(), strlen(message.c_str()), NULL);
+			if (i == Connections.size() - 1)
+				message = "";
 		}
 	}
-	delete buff;
+}
+delete buff;
 }

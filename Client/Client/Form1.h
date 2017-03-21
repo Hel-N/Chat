@@ -96,17 +96,17 @@ namespace Client {
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->label5 = (gcnew System::Windows::Forms::Label());
 			this->tableLayoutPanel3 = (gcnew System::Windows::Forms::TableLayoutPanel());
 			this->richTextBox1 = (gcnew System::Windows::Forms::RichTextBox());
 			this->tableLayoutPanel5 = (gcnew System::Windows::Forms::TableLayoutPanel());
 			this->label3 = (gcnew System::Windows::Forms::Label());
+			this->label6 = (gcnew System::Windows::Forms::Label());
+			this->comboBox1 = (gcnew System::Windows::Forms::ComboBox());
 			this->tableLayoutPanel4 = (gcnew System::Windows::Forms::TableLayoutPanel());
 			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->richTextBox2 = (gcnew System::Windows::Forms::RichTextBox());
 			this->button2 = (gcnew System::Windows::Forms::Button());
-			this->label5 = (gcnew System::Windows::Forms::Label());
-			this->label6 = (gcnew System::Windows::Forms::Label());
-			this->comboBox1 = (gcnew System::Windows::Forms::ComboBox());
 			this->menuStrip1->SuspendLayout();
 			this->tableLayoutPanel1->SuspendLayout();
 			this->tableLayoutPanel2->SuspendLayout();
@@ -137,14 +137,16 @@ namespace Client {
 			// настройкиToolStripMenuItem
 			// 
 			this->настройкиToolStripMenuItem->Name = L"настройкиToolStripMenuItem";
-			this->настройкиToolStripMenuItem->Size = System::Drawing::Size(134, 22);
+			this->настройкиToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->настройкиToolStripMenuItem->Text = L"Настройки";
+			this->настройкиToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::настройкиToolStripMenuItem_Click);
 			// 
 			// выходToolStripMenuItem
 			// 
 			this->выходToolStripMenuItem->Name = L"выходToolStripMenuItem";
-			this->выходToolStripMenuItem->Size = System::Drawing::Size(134, 22);
+			this->выходToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->выходToolStripMenuItem->Text = L"Выход";
+			this->выходToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::выходToolStripMenuItem_Click);
 			// 
 			// tableLayoutPanel1
 			// 
@@ -172,7 +174,7 @@ namespace Client {
 			this->tableLayoutPanel2->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
 				26.36103F)));
 			this->tableLayoutPanel2->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Absolute,
-				245)));
+				248)));
 			this->tableLayoutPanel2->Controls->Add(this->label1, 0, 0);
 			this->tableLayoutPanel2->Controls->Add(this->textBox1, 0, 1);
 			this->tableLayoutPanel2->Controls->Add(this->button1, 1, 1);
@@ -193,7 +195,7 @@ namespace Client {
 			this->label1->Dock = System::Windows::Forms::DockStyle::Bottom;
 			this->label1->Location = System::Drawing::Point(3, 5);
 			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(223, 13);
+			this->label1->Size = System::Drawing::Size(221, 13);
 			this->label1->TabIndex = 0;
 			this->label1->Text = L"Введите ваш ник:";
 			// 
@@ -203,15 +205,15 @@ namespace Client {
 			this->textBox1->Location = System::Drawing::Point(10, 28);
 			this->textBox1->Margin = System::Windows::Forms::Padding(10, 10, 7, 3);
 			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(212, 20);
+			this->textBox1->Size = System::Drawing::Size(210, 20);
 			this->textBox1->TabIndex = 1;
 			// 
 			// button1
 			// 
 			this->button1->Dock = System::Windows::Forms::DockStyle::Top;
-			this->button1->Location = System::Drawing::Point(232, 21);
+			this->button1->Location = System::Drawing::Point(230, 21);
 			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(76, 33);
+			this->button1->Size = System::Drawing::Size(75, 33);
 			this->button1->TabIndex = 2;
 			this->button1->Text = L"Вход";
 			this->button1->UseVisualStyleBackColor = true;
@@ -220,11 +222,22 @@ namespace Client {
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(314, 0);
+			this->label2->Location = System::Drawing::Point(311, 0);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(10, 13);
 			this->label2->TabIndex = 3;
 			this->label2->Text = L".";
+			// 
+			// label5
+			// 
+			this->label5->AutoSize = true;
+			this->label5->Dock = System::Windows::Forms::DockStyle::Top;
+			this->label5->Location = System::Drawing::Point(318, 28);
+			this->label5->Margin = System::Windows::Forms::Padding(10, 10, 3, 0);
+			this->label5->Name = L"label5";
+			this->label5->Size = System::Drawing::Size(236, 13);
+			this->label5->TabIndex = 4;
+			this->label5->Text = L"Состояние: ";
 			// 
 			// tableLayoutPanel3
 			// 
@@ -260,7 +273,7 @@ namespace Client {
 			this->tableLayoutPanel5->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
 				45.32164F)));
 			this->tableLayoutPanel5->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Absolute,
-				256)));
+				259)));
 			this->tableLayoutPanel5->Controls->Add(this->label3, 0, 0);
 			this->tableLayoutPanel5->Controls->Add(this->label6, 1, 0);
 			this->tableLayoutPanel5->Controls->Add(this->comboBox1, 2, 0);
@@ -278,9 +291,30 @@ namespace Client {
 			this->label3->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->label3->Location = System::Drawing::Point(3, 0);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(155, 24);
+			this->label3->Size = System::Drawing::Size(153, 24);
 			this->label3->TabIndex = 0;
 			this->label3->Text = L"Чат:";
+			// 
+			// label6
+			// 
+			this->label6->AutoSize = true;
+			this->label6->Dock = System::Windows::Forms::DockStyle::Right;
+			this->label6->Location = System::Drawing::Point(162, 0);
+			this->label6->Name = L"label6";
+			this->label6->Size = System::Drawing::Size(126, 24);
+			this->label6->TabIndex = 1;
+			this->label6->Text = L"Выбрать собеседника: ";
+			// 
+			// comboBox1
+			// 
+			this->comboBox1->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->comboBox1->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
+			this->comboBox1->FormattingEnabled = true;
+			this->comboBox1->Location = System::Drawing::Point(296, 3);
+			this->comboBox1->Margin = System::Windows::Forms::Padding(5, 3, 10, 3);
+			this->comboBox1->Name = L"comboBox1";
+			this->comboBox1->Size = System::Drawing::Size(245, 21);
+			this->comboBox1->TabIndex = 2;
 			// 
 			// tableLayoutPanel4
 			// 
@@ -316,53 +350,21 @@ namespace Client {
 			this->richTextBox2->Location = System::Drawing::Point(10, 17);
 			this->richTextBox2->Margin = System::Windows::Forms::Padding(10, 3, 3, 3);
 			this->richTextBox2->Name = L"richTextBox2";
-			this->richTextBox2->Size = System::Drawing::Size(439, 37);
+			this->richTextBox2->Size = System::Drawing::Size(440, 37);
 			this->richTextBox2->TabIndex = 1;
 			this->richTextBox2->Text = L"";
 			// 
 			// button2
 			// 
 			this->button2->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->button2->Location = System::Drawing::Point(459, 17);
+			this->button2->Location = System::Drawing::Point(460, 17);
 			this->button2->Margin = System::Windows::Forms::Padding(7, 3, 10, 3);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(88, 37);
+			this->button2->Size = System::Drawing::Size(87, 37);
 			this->button2->TabIndex = 2;
 			this->button2->Text = L"Отправить";
 			this->button2->UseVisualStyleBackColor = true;
 			this->button2->Click += gcnew System::EventHandler(this, &Form1::button2_Click);
-			// 
-			// label5
-			// 
-			this->label5->AutoSize = true;
-			this->label5->Dock = System::Windows::Forms::DockStyle::Top;
-			this->label5->Location = System::Drawing::Point(321, 28);
-			this->label5->Margin = System::Windows::Forms::Padding(10, 10, 3, 0);
-			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(233, 13);
-			this->label5->TabIndex = 4;
-			this->label5->Text = L"Состояние: ";
-			// 
-			// label6
-			// 
-			this->label6->AutoSize = true;
-			this->label6->Dock = System::Windows::Forms::DockStyle::Right;
-			this->label6->Location = System::Drawing::Point(165, 0);
-			this->label6->Name = L"label6";
-			this->label6->Size = System::Drawing::Size(126, 24);
-			this->label6->TabIndex = 1;
-			this->label6->Text = L"Выбрать собеседника: ";
-			// 
-			// comboBox1
-			// 
-			this->comboBox1->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->comboBox1->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
-			this->comboBox1->FormattingEnabled = true;
-			this->comboBox1->Location = System::Drawing::Point(299, 3);
-			this->comboBox1->Margin = System::Windows::Forms::Padding(5, 3, 10, 3);
-			this->comboBox1->Name = L"comboBox1";
-			this->comboBox1->Size = System::Drawing::Size(242, 21);
-			this->comboBox1->TabIndex = 2;
 			// 
 			// Form1
 			// 
@@ -419,7 +421,7 @@ namespace Client {
 	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
 
 				 setlocale(LC_ALL, "Rus");
-				 ifstream in("Server.txt");
+				 ifstream in("..\\..\\Server.txt");
 				 string tmpip;
 				 int tmpport;
 
@@ -431,8 +433,8 @@ namespace Client {
 
 				 try{
 					 if (in.is_open()){
-						 in >> tmpport;
 						 in >> tmpip;
+						 in >> tmpport;
 
 						 port = tmpport;
 						 strcpy(ip, tmpip.c_str());
@@ -440,14 +442,15 @@ namespace Client {
 						 string infostr =  "IP: " + tmpip + " Port: " + to_string(tmpport);
 
 						 label2->Text = gcnew String(infostr.c_str());
+						 in.close();
 					 }
 					 else{
 						 MessageBox::Show("Ошибка чтения данных из файла! Перейдите в пункт меню \"Настройки\".");
 					 }
 				 }
 				 catch (...){
-					 //Form2^ SettinfForm = gcnew Form2();
-					 //SettinfForm->Show();
+					 in.close();
+					 MessageBox::Show("Ошибка чтения данных из файла! Перейдите в пункт меню \"Настройки\".");
 				 }
 
 
@@ -457,8 +460,8 @@ namespace Client {
 		void Send_Message(string& message){
 			if (message != ""){
 				char *buff= new char [1024];
+				message = '|' + message + '|';
 				strcpy(buff, message.c_str());
-				//strcpy(buff, buff);
 				// передаем строку клиента серверу
 				send(Client, buff, strlen(buff), 0);
 			}
@@ -522,6 +525,12 @@ namespace Client {
 						 WSACleanup();
 					 }
 
+					 /*//Отправка ника пользователя серверу
+					 char *buff = new char[1024];
+					 strcpy(buff, msclr::interop::marshal_as<std::string>(textBox1->Text).c_str());
+					 send(Client, buff, strlen(buff), 0);*/
+
+					 //Запуск приема сообщений от пользователя
 					 thread1 = gcnew Thread(gcnew ThreadStart(this, &Form1::Recv_Message));
 					 thread1->Start();
 				 }
@@ -537,6 +546,14 @@ namespace Client {
 				 }
 	}
 
+private: System::Void настройкиToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 Form2 ^ SettingForm = gcnew Form2();
+			 SettingForm->ShowDialog();
+}
+
+private: System::Void выходToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 Form1::Close();
+}
 };
 
 	public ref class ThreadForRecvClass
@@ -552,9 +569,6 @@ namespace Client {
 
 		void Run(String^ s)
 		{
-
-			// Execute the specified delegate on the thread that owns
-			// 'myFormControl1' control's underlying window handle. myFormControl1->myDelegate,
 			String ^ st = s;
 			array<Object^>^ strArray = { st };
 			myFormControl1->Invoke(myFormControl1->myDelegate, strArray);
@@ -576,6 +590,8 @@ namespace Client {
 			ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
 			ThreadObject->Run(Str);
 			
+
+			//?????????????????
 			if (buff[0] == ':')
 				ThreadObject->Run(Environment::NewLine);
 
