@@ -399,14 +399,16 @@ namespace Client {
 
 	private:
 		static SOCKET Client;
-	    static char* ip;
+		static char* ip;
 		int port = 0;
 		bool connectFlag = false;
-		Thread ^ thread1;	
+		Thread ^ thread1;
 
 	public:
 		delegate void AddLineToRivhTextbox(String^ s);
-		AddLineToRivhTextbox^ myDelegate;
+		AddLineToRivhTextbox^ myDelegate1;
+		delegate void AddItemToCombobox(String^ s);
+		AddItemToCombobox^ myDelegate2;
 
 	public: void AddMessageToRichTextbox(String^ s){
 				if (!connectFlag && msclr::interop::marshal_as<std::string>(s) == "Соединение установлено"){
@@ -416,7 +418,12 @@ namespace Client {
 				else{
 					richTextBox1->AppendText(s);
 				}
-		}
+	}
+
+	public: void AddNickToCombobox(String^ s){
+				comboBox1->Items->Add(s->Substring(1, s->Length - 2));
+	}
+
 
 	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
 
@@ -425,7 +432,8 @@ namespace Client {
 				 string tmpip;
 				 int tmpport;
 
-				 myDelegate = gcnew AddLineToRivhTextbox(this, &Form1::AddMessageToRichTextbox);
+				 myDelegate1 = gcnew AddLineToRivhTextbox(this, &Form1::AddMessageToRichTextbox);
+				 myDelegate2 = gcnew AddItemToCombobox(this, &Form1::AddNickToCombobox);
 
 				 richTextBox1->Enabled = false;
 				 richTextBox2->Enabled = false;
@@ -439,7 +447,7 @@ namespace Client {
 						 port = tmpport;
 						 strcpy(ip, tmpip.c_str());
 
-						 string infostr =  "IP: " + tmpip + " Port: " + to_string(tmpport);
+						 string infostr = "IP: " + tmpip + " Port: " + to_string(tmpport);
 
 						 label2->Text = gcnew String(infostr.c_str());
 						 in.close();
@@ -459,8 +467,7 @@ namespace Client {
 	private:
 		void Send_Message(string& message){
 			if (message != ""){
-				char *buff= new char [1024];
-				message = '|' + message + '|';
+				char *buff = new char[1024];
 				strcpy(buff, message.c_str());
 				// передаем строку клиента серверу
 				send(Client, buff, strlen(buff), 0);
@@ -489,8 +496,6 @@ namespace Client {
 						 WSACleanup(); // Деиницилизация библиотеки Winsock
 					 }
 
-					 //**************???????????????????
-
 					 // заполнение структуры sockaddr_in - указание адреса и порта сервера
 					 sockaddr_in dest_addr;
 					 dest_addr.sin_family = AF_INET;
@@ -516,8 +521,6 @@ namespace Client {
 						 }
 					 }
 
-					 //**************???????????????????
-
 					 if (connect(Client, (sockaddr *)&dest_addr, sizeof(dest_addr)))
 					 {
 						 MessageBox::Show("Connect error! ");
@@ -525,36 +528,37 @@ namespace Client {
 						 WSACleanup();
 					 }
 
-					 /*//Отправка ника пользователя серверу
+					 //Отправка ника пользователя серверу
 					 char *buff = new char[1024];
-					 strcpy(buff, msclr::interop::marshal_as<std::string>(textBox1->Text).c_str());
-					 send(Client, buff, strlen(buff), 0);*/
+					 string newnick = '@' + msclr::interop::marshal_as<std::string>(textBox1->Text) + '@';
+					 strcpy(buff, newnick.c_str());
+					 send(Client, buff, strlen(buff), 0);
 
 					 //Запуск приема сообщений от пользователя
 					 thread1 = gcnew Thread(gcnew ThreadStart(this, &Form1::Recv_Message));
 					 thread1->Start();
 				 }
 
-				 
+
 	}
 
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
 				 string mess = msclr::interop::marshal_as<std::string>(richTextBox2->Text);
 				 if (mess != ""){
-					 Send_Message(msclr::interop::marshal_as<std::string>(textBox1->Text) + ": " + mess);
+					 Send_Message("|" + msclr::interop::marshal_as<std::string>(textBox1->Text) + ": " + mess + "|");
 					 richTextBox2->Clear();
 				 }
 	}
 
-private: System::Void настройкиToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
-			 Form2 ^ SettingForm = gcnew Form2();
-			 SettingForm->ShowDialog();
-}
+	private: System::Void настройкиToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+				 Form2 ^ SettingForm = gcnew Form2();
+				 SettingForm->ShowDialog();
+	}
 
-private: System::Void выходToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
-			 Form1::Close();
-}
-};
+	private: System::Void выходToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+				 Form1::Close();
+	}
+	};
 
 	public ref class ThreadForRecvClass
 	{
@@ -567,16 +571,30 @@ private: System::Void выходToolStripMenuItem_Click(System::Object^  sender, Syst
 			myFormControl1 = myForm;
 		}
 
-		void Run(String^ s)
+		void Run_richTextbox(String^ s)
 		{
 			String ^ st = s;
 			array<Object^>^ strArray = { st };
-			myFormControl1->Invoke(myFormControl1->myDelegate, strArray);
+			myFormControl1->Invoke(myFormControl1->myDelegate1, strArray);
+		}
+
+		void Run_Combobox(String^ s)
+		{
+			String ^ st = s;
+			array<Object^>^ strArray = { st };
+			myFormControl1->Invoke(myFormControl1->myDelegate2, strArray);
 		}
 	};
 
 	void Form1::Recv_Message(){
 		char buff[1025];
+
+		bool startMessageFlag = false;
+		bool startNickFlag = false;
+		//bool newNickFlag = false;
+		//bool newMessageFlag = false;
+		string message = "";
+		string nick = "";
 
 		ZeroMemory(&buff, sizeof(buff));
 
@@ -585,18 +603,140 @@ private: System::Void выходToolStripMenuItem_Click(System::Object^  sender, Syst
 			// ставим завершающий ноль в конце строки
 			buff[nsize] = '\0';
 
-			String^ Str = gcnew String(buff);
+			for (int i = 0; i < strlen(buff); ++i){
+				if (buff[i] == '|'){
+					if (!startMessageFlag){
+						startMessageFlag = true;
+						message += buff[i];
+						continue;
+					}
+					else{
+						message += buff[i];
+						startMessageFlag = false;
+						//newMessageFlag = true;
 
+						//Вывод сообщения на экран
+						String^ Str = gcnew String(message.c_str());
+						message = "";
+						ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
+						ThreadObject->Run_richTextbox(Str);
+						message = "";
+					}
+				}
+
+				if (buff[i] == '@'){
+					if (!startNickFlag){
+						if (startMessageFlag){
+							message += buff[i];
+							continue;
+						}
+						else{
+							startNickFlag = true;
+							nick += buff[i];
+							continue;
+						}
+					}
+					else{
+						if (startMessageFlag){
+							message += buff[i];
+							continue;
+						}
+						else{
+							nick += buff[i];
+							startNickFlag = false;
+							//newNickFlag = true;
+
+							//Добавление нового ника к списку
+							String^ Str = gcnew String(nick.c_str());
+							nick = "";
+							ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
+							ThreadObject->Run_Combobox(Str);
+
+							nick = "";
+						}
+					}
+				}
+
+				if (startMessageFlag){
+					message += buff[i];
+					continue;
+				}
+
+				if (startNickFlag){
+					nick += buff[i];
+					continue;
+				}
+			}
+
+			/*//Накопление текста сообщения
+			if (buff[0] == '|' && buff[nsize - 1] == '|'){
+			message += buff;
+			}
+			else{
+			if (buff[0] == '|'){
+			startMessageFlag = true;
+			message += buff;
+			}
+			else{
+			if (startMessageFlag){
+			if (buff[nsize - 1] == '|'){
+			startMessageFlag = false;
+			message += buff;
+			//strcpy_s(buff, message.c_str());
+			}
+			else{
+			message += buff;
+			}
+			}
+			}
+			}
+
+			//Проверка на ник
+			if (buff[0] == '@' && buff[nsize - 1] == '@' && !startMessageFlag){
+			newNickFlag = true;
+			nick += buff;
+			}
+			else{
+			if (buff[0] == '@' && !startMessageFlag){
+			startnickFlag = true;
+			nick += buff;
+			}
+			else{
+			if (startnickFlag){
+			if (buff[nsize - 1] == '@'){
+			startnickFlag = false;
+			nick += buff;
+			newNickFlag = true;
+			}
+			else
+			{
+			nick += buff;
+			}
+			}
+			}
+			}
+
+
+			//Отправка сообщения
+			if (!startMessageFlag && !startnickFlag)
+			{
+			String^ Str = gcnew String(message.c_str());
+			message = "";
 			ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
-			ThreadObject->Run(Str);
-			
+			ThreadObject->Run_richTextbox(Str);
+			}
 
-			//?????????????????
-			if (buff[0] == ':')
-				ThreadObject->Run(Environment::NewLine);
+			//Добавление нового ника к списку
+			if (newNickFlag){
+			newNickFlag = false;
+			String^ Str = gcnew String(nick.c_str());
+			nick = "";
+			ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
+			ThreadObject->Run_Combobox(Str);
+			}*/
 
 		}
-		
+
 
 		ZeroMemory(&buff, sizeof(buff));
 	}
