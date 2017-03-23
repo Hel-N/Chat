@@ -27,6 +27,7 @@ Class Client.Form1: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   Methods:
     AddMessageToRichTextbox(String): PrivateScope, Public, HideBySig
     AddNickToCombobox(String): PrivateScope, Public, HideBySig
+    SizeOfSecondNick(basic_string<char\,std::char_traits<char>\,std::allocator<char> >*): PrivateScope, Public, HideBySig
 Class Client.Form1+AddLineToRivhTextbox: AutoLayout, AnsiClass, Class, NestedPublic, Sealed, BeforeFieldInit
   :System.MulticastDelegate
     Void .ctor(System.Object, IntPtr): PrivateScope, Public, SpecialName, RTSpecialName

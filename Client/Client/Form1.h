@@ -411,19 +411,32 @@ namespace Client {
 		AddItemToCombobox^ myDelegate2;
 
 	public: void AddMessageToRichTextbox(String^ s){
-				if (!connectFlag && msclr::interop::marshal_as<std::string>(s) == "Соединение установлено"){
-					label5->Text += s;
+				string stmp = msclr::interop::marshal_as<std::string>(s);
+				if (!connectFlag && stmp == "Соединение установлено"){
+					label5->Text += s + Environment::NewLine;
 					connectFlag = true;
 				}
 				else{
-					richTextBox1->AppendText(s);
+					richTextBox1->AppendText(s->Substring(0, s->Length - SizeOfSecondNick(stmp)) + Environment::NewLine);
 				}
 	}
 
 	public: void AddNickToCombobox(String^ s){
-				comboBox1->Items->Add(s->Substring(1, s->Length - 2));
+				comboBox1->Items->Add(s);
 	}
 
+	public: int SizeOfSecondNick(string message){
+				string nick1, nick2;
+
+				for (int i = message.size() - 1; i >= 0; --i){
+					if (message[i] != ':')
+						nick2 += message[i];
+					else
+						break;
+				}
+
+				return nick2.size() + 1;
+	}
 
 	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
 
@@ -544,8 +557,10 @@ namespace Client {
 
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
 				 string mess = msclr::interop::marshal_as<std::string>(richTextBox2->Text);
-				 if (mess != ""){
-					 Send_Message("|" + msclr::interop::marshal_as<std::string>(textBox1->Text) + ": " + mess + "|");
+				 string from = msclr::interop::marshal_as<std::string>(textBox1->Text);
+				 string to = msclr::interop::marshal_as<std::string>(comboBox1->Text);
+				 if ( from != "" && to != "" && mess != ""){
+					 Send_Message("|" + from + ": " + mess + ":" + to + "|");
 					 richTextBox2->Clear();
 				 }
 	}
@@ -607,11 +622,11 @@ namespace Client {
 				if (buff[i] == '|'){
 					if (!startMessageFlag){
 						startMessageFlag = true;
-						message += buff[i];
+						//message += buff[i];
 						continue;
 					}
 					else{
-						message += buff[i];
+						//message += buff[i];
 						startMessageFlag = false;
 						//newMessageFlag = true;
 
@@ -626,34 +641,22 @@ namespace Client {
 
 				if (buff[i] == '@'){
 					if (!startNickFlag){
-						if (startMessageFlag){
-							message += buff[i];
-							continue;
-						}
-						else{
-							startNickFlag = true;
-							nick += buff[i];
-							continue;
-						}
+						startNickFlag = true;
+						//nick += buff[i];
+						continue;
 					}
 					else{
-						if (startMessageFlag){
-							message += buff[i];
-							continue;
-						}
-						else{
-							nick += buff[i];
-							startNickFlag = false;
-							//newNickFlag = true;
+						//nick += buff[i];
+						startNickFlag = false;
+						//newNickFlag = true;
 
-							//Добавление нового ника к списку
-							String^ Str = gcnew String(nick.c_str());
-							nick = "";
-							ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
-							ThreadObject->Run_Combobox(Str);
+						//Добавление нового ника к списку
+						String^ Str = gcnew String(nick.c_str());
+						nick = "";
+						ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
+						ThreadObject->Run_Combobox(Str);
 
-							nick = "";
-						}
+						nick = "";
 					}
 				}
 
@@ -667,73 +670,6 @@ namespace Client {
 					continue;
 				}
 			}
-
-			/*//Накопление текста сообщения
-			if (buff[0] == '|' && buff[nsize - 1] == '|'){
-			message += buff;
-			}
-			else{
-			if (buff[0] == '|'){
-			startMessageFlag = true;
-			message += buff;
-			}
-			else{
-			if (startMessageFlag){
-			if (buff[nsize - 1] == '|'){
-			startMessageFlag = false;
-			message += buff;
-			//strcpy_s(buff, message.c_str());
-			}
-			else{
-			message += buff;
-			}
-			}
-			}
-			}
-
-			//Проверка на ник
-			if (buff[0] == '@' && buff[nsize - 1] == '@' && !startMessageFlag){
-			newNickFlag = true;
-			nick += buff;
-			}
-			else{
-			if (buff[0] == '@' && !startMessageFlag){
-			startnickFlag = true;
-			nick += buff;
-			}
-			else{
-			if (startnickFlag){
-			if (buff[nsize - 1] == '@'){
-			startnickFlag = false;
-			nick += buff;
-			newNickFlag = true;
-			}
-			else
-			{
-			nick += buff;
-			}
-			}
-			}
-			}
-
-
-			//Отправка сообщения
-			if (!startMessageFlag && !startnickFlag)
-			{
-			String^ Str = gcnew String(message.c_str());
-			message = "";
-			ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
-			ThreadObject->Run_richTextbox(Str);
-			}
-
-			//Добавление нового ника к списку
-			if (newNickFlag){
-			newNickFlag = false;
-			String^ Str = gcnew String(nick.c_str());
-			nick = "";
-			ThreadForRecvClass^ ThreadObject = gcnew ThreadForRecvClass(this);
-			ThreadObject->Run_Combobox(Str);
-			}*/
 
 		}
 

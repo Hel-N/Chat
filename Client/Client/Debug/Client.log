@@ -1,4 +1,4 @@
-﻿Build started 22.03.2017 22:09:35.
+﻿Build started 24.03.2017 0:08:37.
      1>Project "C:\Users\1\Documents\Visual Studio 2013\Projects\Chat\Client\Client\Client.vcxproj" on node 2 (Build target(s)).
      1>Link:
          Client.vcxproj -> C:\Users\1\Documents\Visual Studio 2013\Projects\Chat\Client\Debug\Client.exe
@@ -6,4 +6,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.23
+Time Elapsed 00:00:00.36

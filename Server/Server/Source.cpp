@@ -125,45 +125,38 @@ void SendMessageToClients(int UserID){
 						//newMessageFlag = true;
 
 						//Отправка сообщения
-						pair<string, string> p = TakeNicksFromMessage(message);
-						send(Connections[p.first], message.c_str(), strlen(message.c_str()), NULL);
-						send(Connections[p.second], message.c_str(), strlen(message.c_str()), NULL);
+						pair<string, string> pNick = TakeNicksFromMessage(message);
+						if (pNick.first == pNick.second){
+							send(Connections[pNick.first], message.c_str(), strlen(message.c_str()), NULL);
+						}
+						else{
+							send(Connections[pNick.first], message.c_str(), strlen(message.c_str()), NULL);
+							send(Connections[pNick.second], message.c_str(), strlen(message.c_str()), NULL);
+						}
 						message = "";
 					}
 				}
 
 				if (buff[i] == '@'){
 					if (!startNickFlag){
-						if (startMessageFlag){
-							message += buff[i];
-							continue;
-						}
-						else{
-							startNickFlag = true;
-							nick += buff[i];
-							continue;
-						}					
+						startNickFlag = true;
+						nick += buff[i];
+						continue;
 					}
 					else{
-						if (startMessageFlag){
-							message += buff[i];
-							continue;
+						nick += buff[i];
+						startNickFlag = false;
+						//newNickFlag = true;
+
+						//Связь сокета с ником
+						Connections[nick] = newConnectSockets[pos_new_socket_without_nick];
+						pos_new_socket_without_nick++;
+
+						for (int i = 0; i < pos_new_socket_without_nick; ++i){
+							send(newConnectSockets[i], nick.c_str(), strlen(nick.c_str()), NULL);
 						}
-						else{
-							nick += buff[i];
-							startNickFlag = false;
-							//newNickFlag = true;
 
-							//Связь сокета с ником
-							Connections[nick] = newConnectSockets[pos_new_socket_without_nick];
-							pos_new_socket_without_nick++;
-
-							for (int i = 0; i < pos_new_socket_without_nick; ++i){
-								send(newConnectSockets[i], nick.c_str(), strlen(nick.c_str()), NULL);
-							}
-
-							nick = "";
-						}
+						nick = "";
 					}
 				}
 
@@ -177,85 +170,6 @@ void SendMessageToClients(int UserID){
 					continue;
 				}
 			}
-
-			//Накопление текста сообщения
-			/*if (buff[0] == '|' && buff[nsize - 1] == '|'){
-				message += buff;
-			}
-			else{
-				if (buff[0] == '|'){
-					startMessageFlag = true;
-					message += buff;
-				}
-				else{
-					if (startMessageFlag){
-						if (buff[nsize - 1] == '|'){
-							startMessageFlag = false;
-							message += buff;
-							//strcpy_s(buff, message.c_str());
-						}
-						else{
-							message += buff;
-						}
-					}
-				}
-			}
-
-			//Проверка на ник
-			if (buff[0] == '@' && buff[nsize - 1] == '@' && !startMessageFlag){
-				newNickFlag = true;
-				nick += buff;
-			}
-			else{
-				if (buff[0] == '@' && !startMessageFlag){
-					startnickFlag = true;
-					nick += buff;
-				}
-				else{
-					if (startnickFlag){
-						if (buff[nsize - 1] == '@'){
-							startnickFlag = false;
-							nick += buff;
-							newNickFlag = true;
-						}
-						else
-						{
-							nick += buff;
-						}
-					}
-				}
-			}
-
-			//string s = buff;
-			//cout << s << endl;
-
-			//Отправка сообщения
-			if (!startMessageFlag && !startnickFlag)
-			{
-				pair<string, string> p = TakeNicksFromMessage(message);
-				send(Connections[p.first], message.c_str(), strlen(message.c_str()), NULL);
-				send(Connections[p.second], message.c_str(), strlen(message.c_str()), NULL);
-			}
-
-			//Связь сокета с ником
-			if (newNickFlag){
-				Connections[nick] = newConnectSockets[pos_new_socket_without_nick];
-				pos_new_socket_without_nick++;
-				newNickFlag = false;
-
-				for (int i = 0; i < pos_new_socket_without_nick; ++i){
-					send(newConnectSockets[i], nick.c_str(), strlen(nick.c_str()), NULL);
-				}
-
-				nick = "";
-			}*/
-
-
-			/*for (int i = 0; i < Connections.size() && !startMessageFlag; ++i){
-				send(Connections[i], message.c_str(), strlen(message.c_str()), NULL);
-				if (i == Connections.size() - 1)
-				message = "";
-				}*/
 		}
 	}
 	delete buff;
@@ -266,17 +180,22 @@ pair<string, string> TakeNicksFromMessage(string message){
 
 	int num = 0;
 
-	for (int i = 0; i < message.size(); ++i){
-		if (message[i] == '@'){
-			num++;
-		}
-
-		switch (num){
-		case 1: nick1 += message[i]; break;
-		case 3: nick2 += message[i]; break;
-		default: break;
-		}
+	for (int i = 1; i < message.size(); ++i){
+		if (message[i] != ':')
+			nick1 += message[i];
+		else
+			break;
 	}
+
+	for (int i = message.size() - 2; i >= 0; --i){
+		if (message[i] != ':')
+			nick2 += message[i];
+
+		else
+			break;
+	}
+
+	reverse(nick2.begin(), nick2.end());
 
 	return make_pair('@' + nick1 + '@', '@' + nick2 + '@');
 }
