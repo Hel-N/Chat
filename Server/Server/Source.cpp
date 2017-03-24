@@ -78,15 +78,6 @@ int main(){
 			online_connections.push_back(true);
 			client_count++; //если он oтключился???????!!!
 
-			/*//Получение ника пользователя
-			char* buff = new char[1024];
-			int nsize;
-			if ((nsize = recv(сonnect_socket, buff, sizeof(buff), NULL)) != SOCKET_ERROR){
-			buff[nsize] = '\0';
-			string str = buff;
-			Connections[str] = сonnect_socket;
-			}*/
-
 			send(сonnect_socket, message_ready, strlen(message_ready), NULL);
 			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)SendMessageToClients, (LPVOID)(client_count - 1), NULL, NULL); // Создаем поток и запускаем функцию в потоке
 		}
@@ -152,8 +143,12 @@ void SendMessageToClients(int UserID){
 						Connections[nick] = newConnectSockets[pos_new_socket_without_nick];
 						pos_new_socket_without_nick++;
 
-						for (int i = 0; i < pos_new_socket_without_nick; ++i){
+						for (int i = 0; i < pos_new_socket_without_nick-1; ++i){
 							send(newConnectSockets[i], nick.c_str(), strlen(nick.c_str()), NULL);
+						}
+
+						for (auto it = Connections.begin(); it != Connections.end(); ++it){
+							send(newConnectSockets[pos_new_socket_without_nick - 1], (it->first).c_str(), strlen((it->first).c_str()), NULL);
 						}
 
 						nick = "";
